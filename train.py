@@ -29,6 +29,8 @@ IMG_WIDTH = 100
 IMG_HEIGHT = 30
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+print(f"🖥️ Using device: {DEVICE}")
+
 # === Dataset & Dataloader ===
 dataset = CaptchaDataset("images", selected_file, char_to_idx, IMG_WIDTH, IMG_HEIGHT)
 loader = DataLoader(
