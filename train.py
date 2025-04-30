@@ -24,7 +24,7 @@ while True:
         print("❌ Invalid selection. Please enter a number between 1 and 3.")
 
 # === Settings ===
-BATCH_SIZE = 128
+BATCH_SIZE = 512
 IMG_WIDTH = 100
 IMG_HEIGHT = 30
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
