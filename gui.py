@@ -163,8 +163,8 @@ root.bind("<Return>", save_label)
 
 # === Start ===
 load_unlabeled_existing_images()
-if len(images_to_label) < NUM_IMAGES:
-    fetch_images()
+# if len(images_to_label) < NUM_IMAGES:
+#     fetch_images()
 
 if images_to_label:
     show_image(current_image_idx)
