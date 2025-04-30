@@ -4,7 +4,6 @@ import torch.nn.functional as F
 import cv2
 import numpy as np
 import pandas as pd
-import questionary
 
 from model import CaptchaModel
 from utils import char_to_idx, idx_to_char
@@ -14,28 +13,43 @@ IMG_WIDTH = 100
 IMG_HEIGHT = 30
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 IMAGE_DIR = "images"
-# LABEL_FILE = "labels.csv"
 MODEL_DIR = "models"
 num_classes = len(char_to_idx) + 1  # +1 for CTC blank token
 
-LABEL_FILE = questionary.select(
-    "Select label file to use:",
-    choices=["train.csv", "test.csv", "labels.csv"],
-    default="labels.csv",
-).ask()
+# === Select LABEL_FILE ===
+csv_choices = ["train.csv", "test.csv", "labels.csv"]
+print("📂 Select label file:")
+for i, name in enumerate(csv_choices, 1):
+    print(f"{i}. {name}")
+
+while True:
+    try:
+        idx = int(input("Enter number (1-3): "))
+        LABEL_FILE = csv_choices[idx - 1]
+        print(f"✅ Selected: {LABEL_FILE}")
+        break
+    except (ValueError, IndexError):
+        print("❌ Invalid selection, try again.")
 
 
 # === Model loading ===
 def load_model_interactively():
     available_models = sorted([f for f in os.listdir(MODEL_DIR) if f.endswith(".pth")])
-
     if not available_models:
         print("❌ No model files found in 'models/' directory.")
         exit()
 
-    selected_model = questionary.select(
-        "📦 Which model do you want to test?", choices=available_models
-    ).ask()
+    print("\n📦 Available models:")
+    for i, name in enumerate(available_models, 1):
+        print(f"{i}. {name}")
+
+    while True:
+        try:
+            idx = int(input("Select model number: "))
+            selected_model = available_models[idx - 1]
+            break
+        except (ValueError, IndexError):
+            print("❌ Invalid selection, try again.")
 
     model_path = os.path.join(MODEL_DIR, selected_model)
     model = CaptchaModel(num_classes=num_classes)

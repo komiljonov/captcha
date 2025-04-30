@@ -7,6 +7,22 @@ from model import CaptchaModel
 from dataset import CaptchaDataset
 from utils import char_to_idx
 
+# === Select CSV file with input ===
+csv_options = ["train.csv", "test.csv", "labels.csv"]
+
+print("📂 Select CSV file for training:")
+for idx, fname in enumerate(csv_options, 1):
+    print(f"{idx}. {fname}")
+
+while True:
+    try:
+        selected_idx = int(input("Enter file number (1–3): "))
+        selected_file = csv_options[selected_idx - 1]
+        print(f"✅ Selected file: {selected_file}")
+        break
+    except (ValueError, IndexError):
+        print("❌ Invalid selection. Please enter a number between 1 and 3.")
+
 # === Settings ===
 BATCH_SIZE = 32
 IMG_WIDTH = 100
@@ -14,7 +30,7 @@ IMG_HEIGHT = 30
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # === Dataset & Dataloader ===
-dataset = CaptchaDataset("images", "train.csv", char_to_idx, IMG_WIDTH, IMG_HEIGHT)
+dataset = CaptchaDataset("images", selected_file, char_to_idx, IMG_WIDTH, IMG_HEIGHT)
 loader = DataLoader(
     dataset, batch_size=BATCH_SIZE, shuffle=True, collate_fn=lambda x: x
 )
@@ -57,8 +73,7 @@ while True:
                     DEVICE
                 )
 
-                preds = model(imgs)
-                preds = preds.log_softmax(2)
+                preds = model(imgs).log_softmax(2)
 
                 input_lengths = torch.full(
                     size=(preds.size(0),), fill_value=preds.size(1), dtype=torch.long
