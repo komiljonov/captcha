@@ -17,7 +17,7 @@ MODEL_DIR = "models"
 num_classes = len(char_to_idx) + 1  # +1 for CTC blank token
 
 # === Select LABEL_FILE ===
-csv_choices = ["train.csv", "test.csv", "labels.csv"]
+csv_choices = ["train.csv", "test.csv", "labels.csv","news.csv"]
 print("📂 Select label file:")
 for i, name in enumerate(csv_choices, 1):
     print(f"{i}. {name}")
