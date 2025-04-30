@@ -1,69 +1,29 @@
-import torch
-import torch.nn.functional as F
-import cv2
-import numpy as np
-from model import CaptchaModel
-from utils import char_to_idx, idx_to_char
-
-# Settings
-IMG_WIDTH = 100
-IMG_HEIGHT = 30
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-# Number of classes (+1 for blank token)
-num_classes = len(char_to_idx) + 1
-
-# Load model
-model = CaptchaModel(num_classes=num_classes)
-model.load_state_dict(torch.load("captcha_model.pth", map_location=DEVICE))
-model = model.to(DEVICE)
-model.eval()
-
-
-def preprocess_image(img_path):
-    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-    img = cv2.resize(img, (IMG_WIDTH, IMG_HEIGHT))
-    img = img / 255.0
-    img = np.expand_dims(img, axis=0)  # (1, H, W)
-    img = np.expand_dims(img, axis=0)  # (1, 1, H, W)
-    return torch.FloatTensor(img).to(DEVICE)
-
-
-def decode_prediction(preds):
-    preds = preds.softmax(2)  # softmax over classes
-    preds = preds.argmax(2)  # take class with max probability
-    preds = preds.squeeze(0)  # remove batch dimension
-
-    # Collapse repeating characters and remove blanks
-    prev_char = None
-    output = ""
-    for idx in preds:
-        idx = idx.item()
-        if idx != num_classes - 1:  # Ignore blank
-            char = idx_to_char[idx]
-            if char != prev_char:
-                output += char
-                prev_char = char
-        else:
-            prev_char = None
-    return output
-
-
-def predict(img_path):
-    img = preprocess_image(img_path)
-    with torch.no_grad():
-        preds = model(img)
-    text = decode_prediction(preds)
-    return text
-
-
-if __name__ == "__main__":
-    import sys
-
-    if len(sys.argv) != 2:
-        print("Usage: python predict.py path_to_image")
-        sys.exit(1)
-
-    img_path = sys.argv[1]
-    prediction = predict(img_path)
-    print(f"Predicted text: {prediction}")
+print(
+    """images/039_864DC34B0F274A2F9B8FC7B37FA22E42.png: True='JVYZ' | Predicted='JVYz'
+images/036_CE158C8330CE4142AF62C25C7DE75700.png: True='4w9w' | Predicted='4w0w'
+images/039_D6B9E072524B40A7924113B830895B37.png: True='rKDh' | Predicted='rKh'
+images/034_2AB0A4612D2D4D9595C5A7EF56CEC2E8.png: True='z3y8' | Predicted='z3v8'
+images/046_3ADA3FAF1A1D43A4A25325F1ADDDB04B.png: True='Umzq' | Predicted='Umzg'
+images/026_F22FC92C030945018FD09A0D8B507B85.png: True='Aiv4' | Predicted='Jiv4'
+images/038_9CB6E5B27121482ABD6D1E5A3A5ABE06.png: True='cSSb' | Predicted='cSSp'
+images/039_B99F10FD0C014427AD25D7151BDACE04.png: True='FvWg' | Predicted='FvWq'
+images/013_DBEF5CD8C2534513A637B9093B7A5BEB.png: True='8MJ2' | Predicted='8MU2'
+images/032_0ECAF5C91622474CA2B48F04CFEA2BDF.png: True='ucbd' | Predicted='uc5d'
+images/030_13A8DC6917804B068D520D6470B97F2A.png: True='Xty4' | Predicted='XTy4'
+images/045_ACBACC05467F4E8798A4C852EF231AF6.png: True='g7de' | Predicted='g7ds'
+images/033_7F942F868E644A00B1C4BDAC5DEE8FDD.png: True='LGVb' | Predicted='LCVb'
+images/050_6CC73262D0F845D1BDE86D99FBC7B2E2.png: True='dHmg' | Predicted='dHma'
+images/001_6AADD2EA6098422FA1B13BCB7170A455.png: True='m29y' | Predicted='m29v'
+images/004_E68BE34E2C5C4669885EE73798A5B28B.png: True='gaA9' | Predicted='gqA9'
+images/014_0301F7E64F414350AECF52EE91F6DE6E.png: True='gwkQ' | Predicted='awkQ'
+images/001_385F2E7F98D94256AC48C602678E9767.png: True='AFmX' | Predicted='AFmK'
+images/007_EA90F81E2D3946399F2DDDB0DA0DF0E3.png: True='HMei' | Predicted='HMej'
+images/api_018_E3EBA815CD194AC5A872B9AA458E04BF.png: True='gjA4' | Predicted='qjA4'
+images/api_028_5CE65AC7076346C6BAB9C4B8CCB666D2.png: True='giEM' | Predicted='qiEM'
+images/api_040_E71838A303E5466D88640DC824048B01.png: True='tPdy' | Predicted='tPdv'
+images/api_045_F617A8481F2649C9B301B4476665FEA4.png: True='yXF5' | Predicted='yXFS'
+images/api_006_244CCF7C9CB04F6989100BB76B21C9B4.png: True='SBxt' | Predicted='Sxt'
+images/api_012_83A59C57298746A780CC3A2B0DB00911.png: True='fx9A' | Predicted='fx0A'
+images/api_029_85BCFCB33771487C9EDFA3006CF53414.png: True='pUei' | Predicted='pUej'
+images/api_045_47A62A09A1AD474BA2D40A4EDAB11B11.png: True='2BCz' | Predicted='2BCZ'"""
+)
