@@ -7,6 +7,7 @@ import csv
 import tkinter as tk
 from tkinter import messagebox
 
+
 # === Constants ===
 URL = "https://127.0.0.1/ISAPI/Bumblebee/Platform/V0/VerificationCodeImage?CT=0&MT=GET"
 HEADERS = {"Content-Type": "application/json"}
